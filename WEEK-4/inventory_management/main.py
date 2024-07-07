@@ -1,7 +1,8 @@
 from inventory import *
 from food_item import *
-from file_manager import *
+from file_manager import save_items, load_items
 from datetime import datetime
+import csv
 
 FILE_NAME = 'inventory.csv'
 
@@ -12,8 +13,10 @@ def display_menu():
     print("3. Delete Item")
     print("4. Search Item")
     print("5. List All Items")
-    print("6. Save & Exit")
-    print("7. Exit without Saving")
+    print("6. Near Expiry Items")
+    print("7. Generate Report")
+    print("8. Save & Exit")
+    print("9. Exit without Saving")
 
 def add_item(inventory):
     name = input("Enter item name: ")
@@ -57,10 +60,26 @@ def list_all_items(inventory):
     for item in inventory:
         print(item)
 
-def main():
-    inventory = Inventory()
-    inventory.items = load_items(FILE_NAME)
+def near_expiry_items(inventory):
+    days = int(input("Enter the number of days to check for near expiry items: "))
+    items = inventory.near_expiry_items(days)
+    if items:
+        for item in items:
+            print(item)
+    else:
+        print("No near expiry items found.")
 
+def generate_report(inventory):
+    report = inventory.generate_report()
+    print("\nInventory Report:")
+    print(f"Total Items: {report['total_items']}")
+    print(f"Near Expiry Items: {report['near_expiry']}")
+    print("Items by Category:")
+    for category, count in report['categories'].items():
+        print(f"  {category}: {count}")
+
+def main():
+    inventory = load_items()
     while True:
         display_menu()
         choice = input("Enter your choice: ")
@@ -75,10 +94,14 @@ def main():
         elif choice == '5':
             list_all_items(inventory)
         elif choice == '6':
-            save_items(FILE_NAME, inventory.items)
+            near_expiry_items(inventory)
+        elif choice == '7':
+            generate_report(inventory)
+        elif choice == '8':
+            save_items(inventory, FILE_NAME)
             print("Inventory saved. Exiting...")
             break
-        elif choice == '7':
+        elif choice == '9':
             print("Exiting without saving...")
             break
         else:
