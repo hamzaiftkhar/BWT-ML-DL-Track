@@ -7,7 +7,16 @@ from datetime import datetime
 class Inventory:
     def __init__(self):
         self.items = []
-       
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def near_expiry_generator(self, days=7):
+        current_date = datetime.now().date()
+        for item in self.items:
+            expiry_date = datetime.strptime(item.expiry_date, '%Y-%m-%d').date()
+            if (expiry_date - current_date).days <= days:
+                yield item
 
     # this function is used to add an item to the inventory
     def add_item(self, item):
