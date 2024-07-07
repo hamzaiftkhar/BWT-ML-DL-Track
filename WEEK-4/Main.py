@@ -1,5 +1,5 @@
-#-------------------------------------------Stage-1-------------------------------------------
-
+#-------------------------------------------Stage-2-------------------------------------------
+import csv
 from datetime import datetime
 
 
@@ -20,8 +20,33 @@ class FoodItem:
 
 #-------------------Inventory Class-------------------
 class Inventory:
-    def __init__(self):
+    def __init__(self, filename):
         self.items = []
+        self.filename = filename
+        self.load_items()
+
+    def load_items(self):
+        try:
+            with open(self.filename, 'r') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if row:
+                        item = FoodItem(row[0], row[1], row[2], row[3], row[4], row[5])
+                        self.items.append(item)
+        except FileNotFoundError:
+            print("File not found. Starting with an empty inventory.")
+        except Exception as e:
+            print(f"Error reading file: {e}")
+
+    def save_items(self):
+        try:
+            with open(self.filename, 'w', newline='') as file:
+                writer = csv.writer(file)
+                for item in self.items:
+                    writer.writerow([item.name, item.category, item.quantity, item.barcode, item.expiry_date, item.price])
+        except Exception as e:
+            print(f"Error writing file: {e}")
+
 
     # this function is used to add an item to the inventory
     def add_item(self, item):
